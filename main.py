@@ -71,7 +71,9 @@ def isValidNumber(var):
         return True
     except:
         return False
+        
 memory_addresses = [0 for i in range(10000)] # Memory addresses for array purposes
+
 """
 readLine()
 matches()
