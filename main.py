@@ -9,8 +9,9 @@ global regexTerms
 text_array = []
 variable_holder = {}
 regexTerms = []
-regexTerms.append(r"( |\t)*([a-zA-Z]+)( |\t)*,( |\t)*(\d+)( |\t)*")
-regexTerms.append(r"( |\t)*([a-zA-Z]+)( |\t)*([a-zA-Z]+)( |\t)*,( |\t)*(([a-zA-Z]+)|(\d+))( |\t)*")
+regexTerms.append(r"^([a-zA-Z]+)( |\t)*,( |\t)*(\d+)( |\t)*-?[0-9]+$") #Variable Declaration
+regexTerms.append(r"^([a-zA-Z]+)( |\t)*([a-zA-Z]+)( |\t)*,( |\t)*(([a-zA-Z]+)|-?[0-9]+)$")
+regexTerms.append(r"^( )*$")
 
 registers = {"R1": 0,"R2":0, "R3":0, "R4":0,"R5":0,"R6":0,"R7":0,"R8":0, "R9":0, "R10":0,
          "R11": 0, "R12":0, "R13":0, "R14":0,"R15":0,"R16":0,"R17":0,"R18":0, "R19":0, "R20":0,
@@ -23,55 +24,68 @@ registers = {"R1": 0,"R2":0, "R3":0, "R4":0,"R5":0,"R6":0,"R7":0,"R8":0, "R9":0,
 def readLine():
     try:
         textFile = open("Benchmark2.txt", 'r')
-        for line in textFile:
+        for line in textFile: # This for loop will place all lines into a list for syntax check
             line = line.strip()
-            #lineArray = line.split(' ')
             text_array.append(line)
-            print line
-        #execute()
     except:
         print ("File does not exist")
         exit(1)
-def matches():
+def verifySyntax():
     lineNumber = 1
     for f in text_array:
+        print f
         if re.match(regexTerms[0], f):
-            print f, " Matches first"
+            text_array[text_array.index(f)] = re.split(",", f) # Strings split at commas (spaces included in strings however)
         elif re.match(regexTerms[1], f):
-            print f, " Matches second"
+            text_array[text_array.index(f)] = re.split(",", f)
+        elif re.match(regexTerms[2], f):
+            text_array[text_array.index(f)] = ""
         else:
             print "Syntax Error on line", lineNumber, ": ", f
+            print "Terminating Program"
             exit(1)
         lineNumber += 1
 """
 def execute():
-    print text_array
+    lineNumber = 1
     for instruction in text_array:
-        if instruction[0] == "ADD":
-            key = instruction[1]
+        if len(instruction) == 2: # Variable/register declaration
+            key = instruction[0].split()
+            key2 = instruction[0].split()
             if key in registers:
-                registers[key] += instruction[2]
+                if key2 in registers:
+                    registers[key] = registers[key2]
+                elif key2 in variable_holder:
+                    registers[key] = variable_holder[key2]
+                else
+                    registers[key] = isValidNumber(key2, lineNumber)
             elif key in variable_holder:
-                variable_holder[key] += instruction[2]
+                if key2 in registers:
+                    variable_holder[key] = registers[key2]
+                elif key2 in variable_holder:
+                    variable_holder[key] = variable_holder[key2]
+                else
+                    variable_holder[key] = isValidNumber(key2, lineNumber)
             else:
-                print Key, " is not a register nor variable"
-                exit(1)
-        elif instruction[0] == "HALT":
-            break
-        else: # Catches variable naming and initialization
-            if isValidNumber(instruction[1]):
-                variable_holder[instruction[0]] = int(instruction[1])
-                text_array.remove(instruction)
-            else:
-                print "Are you stupid? Can\'t convert to int dummy."
+                variable_holder[key] = isValidNumber(key2, lineNumber)
+        
+        elif len(instruction) == 1:
+            if instruction[0] == "HALT":
+                break
 
-def isValidNumber(var):
-    try:
-        int(var)
-        return True
-    except:
-        return False
-memory_addresses = [0 for i in range(10000)] # Memory addresses for array purposes
+        lineNumber += 1
 """
+def isValidNumber(var, lineNum):
+    try:
+        var = int(var)
+        return var
+    except:
+        print "Error on line", lineNum, ": ", var, " is neither a variable, register, nor an integer"
+        print "Terminating Program"
+        exit(1)
+
+memory_addresses = [0 for i in range(10000)] # Memory addresses for array purposes
+
 readLine()
-matches()
+verifySyntax() # Checks for syntax errors
+print text_array
