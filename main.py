@@ -44,7 +44,7 @@ def verifySyntax():
             text_array[text_array.index(f)] = ""
         elif re.match(regexTerms[3], f):
             temp = "".join(f.split())
-            print temp
+            
             text_array[text_array.index(f)] = [temp[:len(temp) -1],temp[-1]]
         else:
             print "Syntax Error on line", lineNumber, ": ", f
