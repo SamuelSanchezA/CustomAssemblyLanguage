@@ -12,6 +12,7 @@ regexTerms = []
 regexTerms.append(r"^([a-zA-Z]+)( |\t)*,( |\t)*(\d+)( |\t)*-?[0-9]+$") #Variable Declaration
 regexTerms.append(r"^([a-zA-Z]+)( |\t)*([a-zA-Z]+)( |\t)*,( |\t)*(([a-zA-Z]+)|-?[0-9]+)$")
 regexTerms.append(r"^( )*$")
+regexTerms.append(r"^([a-zA-Z]+)( |\t)*(\:)( |\t)*$")
 
 registers = {"R1": 0,"R2":0, "R3":0, "R4":0,"R5":0,"R6":0,"R7":0,"R8":0, "R9":0, "R10":0,
          "R11": 0, "R12":0, "R13":0, "R14":0,"R15":0,"R16":0,"R17":0,"R18":0, "R19":0, "R20":0,
@@ -30,6 +31,7 @@ def readLine():
     except:
         print ("File does not exist")
         exit(1)
+
 def verifySyntax():
     lineNumber = 1
     for f in text_array:
@@ -40,6 +42,10 @@ def verifySyntax():
             text_array[text_array.index(f)] = re.split(",", f)
         elif re.match(regexTerms[2], f):
             text_array[text_array.index(f)] = ""
+        elif re.match(regexTerms[3], f):
+            temp = "".join(f.split())
+            print temp
+            text_array[text_array.index(f)] = [temp[:len(temp) -1],temp[-1]]
         else:
             print "Syntax Error on line", lineNumber, ": ", f
             print "Terminating Program"
