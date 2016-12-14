@@ -38,13 +38,16 @@ def verifySyntax():
         print f
         if re.match(regexTerms[0], f):
             text_array[text_array.index(f)] = re.split(",", f) # Strings split at commas (spaces included in strings however)
+            text_array[lineNumber - 1][0] = text_array[lineNumber - 1][0].strip()
+            text_array[lineNumber - 1][1] = text_array[lineNumber - 1][1].strip()
         elif re.match(regexTerms[1], f):
             text_array[text_array.index(f)] = re.split(",", f)
+            text_array[lineNumber - 1][0] = text_array[lineNumber - 1][0].strip()
+            text_array[lineNumber - 1][1] = text_array[lineNumber - 1][1].strip()
         elif re.match(regexTerms[2], f):
             text_array[text_array.index(f)] = ""
         elif re.match(regexTerms[3], f):
-            temp = "".join(f.split())
-            
+            temp = "".join(f.split())    
             text_array[text_array.index(f)] = [temp[:len(temp) -1],temp[-1]]
         else:
             print "Syntax Error on line", lineNumber, ": ", f
