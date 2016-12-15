@@ -12,6 +12,7 @@ regexTerms = []
 regexTerms.append(r"^([a-zA-Z]+)( |\t)*,( |\t)*(\d+)( |\t)*-?[0-9]+$") #Variable Declaration
 regexTerms.append(r"^([a-zA-Z]+)( |\t)*([a-zA-Z]+)( |\t)*,( |\t)*(([a-zA-Z]+)|-?[0-9]+)$")
 regexTerms.append(r"^( )*$")
+regexTerms.append(r"^([a-zA-Z]+)( |\t)*(\:)( |\t)*$")
 
 registers = {"R1": 0,"R2":0, "R3":0, "R4":0,"R5":0,"R6":0,"R7":0,"R8":0, "R9":0, "R10":0,
          "R11": 0, "R12":0, "R13":0, "R14":0,"R15":0,"R16":0,"R17":0,"R18":0, "R19":0, "R20":0,
@@ -33,48 +34,96 @@ def readLine():
 def verifySyntax():
     lineNumber = 1
     for f in text_array:
-        print f
+        #print f
         if re.match(regexTerms[0], f):
+            print f
             text_array[text_array.index(f)] = re.split(",", f) # Strings split at commas (spaces included in strings however)
         elif re.match(regexTerms[1], f):
-            text_array[text_array.index(f)] = re.split(",", f)
+            index = text_array.index(f)
+            text_array[index] = re.split(",", f)
+            temp = text_array[index][0].split(" ")
+            text_array[index].remove(text_array[index][0])
+            text_array[index].insert(0,temp[0])
+            text_array[index].insert(1,temp[-1])
+            #print "UGGGH: ", text_array[index]
         elif re.match(regexTerms[2], f):
             text_array[text_array.index(f)] = ""
+        elif re.match(regexTerms[3],f):
+            temp = "".join(f.split())
         else:
             print "Syntax Error on line", lineNumber, ": ", f
             print "Terminating Program"
             exit(1)
-        lineNumber += 1
-"""
+
+
 def execute():
     lineNumber = 1
     for instruction in text_array:
+        #print instruction
+        if len(instruction) == 0:
+                continue
+
+
         if len(instruction) == 2: # Variable/register declaration
-            key = instruction[0].split()
-            key2 = instruction[0].split()
+            key = instruction[0].strip()
+            key2 = instruction[1].strip()
             if key in registers:
                 if key2 in registers:
                     registers[key] = registers[key2]
                 elif key2 in variable_holder:
-                    registers[key] = variable_holder[key2]
-                else
+                        registers[key] = variable_holder[key2]
+                else:
                     registers[key] = isValidNumber(key2, lineNumber)
             elif key in variable_holder:
-                if key2 in registers:
-                    variable_holder[key] = registers[key2]
-                elif key2 in variable_holder:
-                    variable_holder[key] = variable_holder[key2]
-                else
-                    variable_holder[key] = isValidNumber(key2, lineNumber)
-            else:
-                variable_holder[key] = isValidNumber(key2, lineNumber)
-        
-        elif len(instruction) == 1:
-            if instruction[0] == "HALT":
+                    if key2 in registers:
+                        variable_holder[key] = registers[key2]
+                    elif key2 in variable_holder:
+                        variable_holder[key] = variable_holder[key2]
+                    else:
+                        variable_holder[key] = isValidNumber(key2, lineNumber)
+
+        elif len(instruction) == 3:
+            print ("Nigga we made it")
+            """
+            # Checks for instruction with length of 3
+            if key == "ADD":
+                add(instruction)
+            elif key == "SUBT":
+                subt(instruction)
+            elif key == "MULT":
+                mult(instruction)
+            elif key == "DIV":
+                div(instruction)
+            elif key == "ARRADD":
+                addToArray(instruction)
+            elif key == "ARRAT":
+                loadArrayAt(instruction)
+            elif key == "ARRFIND":
+                findVal(instruction)
+        """
+        if len(instruction) == 1:
+            if instruction[0] == " ":
+                print "HALT"
                 break
 
-        lineNumber += 1
-"""
+        print instruction
+
+    lineNumber += 1
+
+def add(instruction):
+    left_num = 0
+    right_num = 0
+    
+    #static const to int
+    left_num = int(instruction[1])
+    right_num = int(instruction[2])
+
+
+    global accumulator
+    accumulator = left_num + right_num
+
+    print "Hello Nick"
+
 def isValidNumber(var, lineNum):
     try:
         var = int(var)
@@ -88,4 +137,7 @@ memory_addresses = [0 for i in range(10000)] # Memory addresses for array purpos
 
 readLine()
 verifySyntax() # Checks for syntax errors
-print text_array
+#print text_array
+#execute()
+#print text_array
+#print text_array
