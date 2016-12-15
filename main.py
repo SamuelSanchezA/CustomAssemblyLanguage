@@ -61,6 +61,7 @@ def verifySyntax():
 		    print "Syntax Error on line", lineNumber, ": ", f
 		    print "Terminating Program"
 		    exit(1)
+		lineNumber += 1
 
 
 def execute():
