@@ -64,6 +64,7 @@ def verifySyntax():
 		    print "Syntax Error on line", lineNumber, ": ", f
 		    print "Terminating Program"
 		    exit(1)
+		lineNumber += 1
 
 
 def execute():
@@ -112,13 +113,13 @@ def execute():
                 loadArrayAt(instruction)
             elif opCode == "ARRFIND":
                 findVal(instruction)
+            else:
+                print "Wrong operation code!\n"
         
         if len(instruction) == 1:
             if instruction[0] == " ":
                 print "HALT"
                 break
-
-        print instruction
 
     lineNumber += 1
 
@@ -129,12 +130,45 @@ def add(instruction):
     left_num = int(variable_holder[instruction[1]])
     right_num = int(instruction[2])
 
+    variable_holder[instruction[1]] += right_num
 
-    global accumulator
-    accumulator = left_num + right_num
+    #print variable_holder[instruction[1]]
 
-    print "Hello Nick"
-    print accumulator
+
+def subt(instruction):
+    left_num = 0
+    right_num = 0
+    
+    left_num = int(variable_holder[instruction[1]])
+    right_num = int(instruction[2])
+
+    variable_holder[instruction[1]] -= right_num
+
+    #print variable_holder[instruction[1]]
+
+def mult(instruction):
+    left_num = 0
+    right_num = 0
+    
+    left_num = int(variable_holder[instruction[1]])
+    right_num = int(instruction[2])
+
+    variable_holder[instruction[1]] *= right_num
+
+    #print variable_holder[instruction[1]]
+
+def div(instruction):
+    left_num = 0
+    right_num = 0
+    
+    left_num = int(variable_holder[instruction[1]])
+    right_num = int(instruction[2])
+
+    if right_num != 0:
+        variable_holder[instruction[1]] /= right_num
+        #print variable_holder[instruction[1]]
+    else: 
+        print "Could not divide by zero!"
 
 def isValidNumber(var, lineNum):
     try:
@@ -151,5 +185,4 @@ readLine()
 verifySyntax() # Checks for syntax errors
 #print text_array
 execute()
-print text_array
 #print text_array
