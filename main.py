@@ -9,7 +9,7 @@ global regexTerms
 text_array = []
 variable_holder = {}
 regexTerms = []
-regexTerms.append(r"^([a-zA-Z]+)( |\t)*,( |\t)*( |\t)*(-?[0-9]+)$") #Variable Declaration
+regexTerms.append(r"^([a-zA-Z]+)( |\t)*,( |\t)*( |\t)*([a-zA-Z]+|-?[0-9]+)$") #Variable Declaration
 regexTerms.append(r"^([a-zA-Z]+)( |\t)*([a-zA-Z]+)( |\t)*,( |\t)*(([a-zA-Z]+)|-?[0-9]+)$")
 regexTerms.append(r"^( )*$")
 regexTerms.append(r"^([a-zA-Z]+)( |\t)*(\:)( |\t)*$")
@@ -35,14 +35,14 @@ def readLine():
 def verifySyntax():
 	lineNumber = 1
 	for f in text_array:
-
+		#print f
 		if re.match(regexTerms[0], f):
+			#print f
 			text_array[text_array.index(f)] = re.split(",", f) # Strings split at commas (spaces included in strings however)
 			text_array[lineNumber - 1][0] = text_array[lineNumber - 1][0].strip()
 			text_array[lineNumber - 1][1] = text_array[lineNumber - 1][1].strip()
-
 		elif re.match(regexTerms[1], f):
-
+			#print "In second: ", f
 			index = text_array.index(f)
 			text_array[index] = re.split(",", f)
 			temp = text_array[index][0].split(" ")
@@ -52,79 +52,94 @@ def verifySyntax():
 			text_array[index][0] = text_array[index][0].strip()
 			text_array[index][1] = text_array[index][1].strip()
 			text_array[index][2] = text_array[index][2].strip()
-
 		elif re.match(regexTerms[2], f):
-		    text_array[text_array.index(f)] = ""
-
+			text_array[text_array.index(f)] = ""
 		elif re.match(regexTerms[3], f):
-		    temp = "".join(f.split())    
-		    text_array[text_array.index(f)] = [temp[:len(temp) -1],temp[-1]]
-            
+			temp = "".join(f.split())    
+			text_array[text_array.index(f)] = [temp[:len(temp) -1],temp[-1]]
 		else:
-		    print "Syntax Error on line", lineNumber, ": ", f
-		    print "Terminating Program"
-		    exit(1)
-		lineNumber += 1
-
+			print "Syntax Error on line", lineNumber, ": ", f
+			print "Terminating Program"
+			exit(1)
+		lineNumber = lineNumber + 1
+		print lineNumber
 
 def execute():
-    lineNumber = 1
-    for instruction in text_array:
+	lineNumber = 1
+	while lineNumber - 1 < len(text_array):
 
-        if len(instruction) == 0:
-                continue
+		instruction = text_array[lineNumber]
+		print instruction
+		#print instruction
+		if len(instruction) == 0:
+			lineNumber = lineNumber + 1
+			continue
 
-        if len(instruction) == 2: # Variable/register declaration
-            key = instruction[0].strip()
-            key2 = instruction[1].strip()
-            if key in registers:
-                if key2 in registers:
-                    registers[key] = registers[key2]
-                elif key2 in variable_holder:
-                    registers[key] = variable_holder[key2]
-                else:
-                    registers[key] = isValidNumber(key2, lineNumber)
-            elif key in variable_holder:
-                if key2 in registers:
-                    variable_holder[key] = registers[key2]
-                elif key2 in variable_holder:
-                    variable_holder[key] = variable_holder[key2]
-                else:
-                    variable_holder[key] = isValidNumber(key2, lineNumber)
-            else:
-            	variable_holder[key] = isValidNumber(key2, lineNumber)
+		elif len(instruction) == 1:
+			if instruction[0] == "HALT":
+				print "HALT"
+				exit(1)
 
-        # Checks for instruction with length of 3
-        elif len(instruction) == 3:
+		elif len(instruction) == 2: # Variable/register declaration
+			key = instruction[0].strip()
+			key2 = instruction[1].strip()
+			if key in registers:
+				if key2 in registers:
+					registers[key] = registers[key2]
+				elif key2 in variable_holder:
+					registers[key] = variable_holder[key2]
+				else:
+					registers[key] = isValidNumber(key2, lineNumber)
+			elif key in variable_holder:
+				if key2 in registers:
+					variable_holder[key] = registers[key2]
+				elif key2 in variable_holder:
+					variable_holder[key] = variable_holder[key2]
+				else:
+					variable_holder[key] = isValidNumber(key2, lineNumber)
+			elif key2 == ':':
+				variable_holder[key] = lineNumber + 1
+			elif key == 'JUMP':
+				lineNumber = jump(instruction)
+				continue
+			else:
+				variable_holder[key] = isValidNumber(key2, lineNumber)
 
-            opCode = instruction[0] #the read opCode
-            
-            if opCode == "ADD":
-                add(instruction)
-            elif opCode == "SUBT":
-                subt(instruction)
-            elif opCode == "MULT":
-                mult(instruction)
-            elif opCode == "DIV":
-                div(instruction, lineNumber)
-            elif opCode == "ARRADD":
-                addToArray(instruction)
-            elif opCode == "ARRAT":
-                loadArrayAt(instruction)
-            elif opCode == "ARRFIND":
-                findVal(instruction)
-            else:
-                print "Error on Line", lineNumber, "Wrong operation code!"
-                exit(1)
-        
-        if len(instruction) == 1:
-            if instruction[0] == " ":
-                print "HALT"
-                break
+		# Checks for instruction with length of 3
+		elif len(instruction) == 3:
+			opCode = instruction[0]
+			#the read opCode
 
-    	lineNumber += 1 
+			if opCode == "ADD":
+				add(instruction)
+			elif opCode == "SUBT":
+				subt(instruction)
+			elif opCode == "MULT":
+				mult(instruction)
+			elif opCode == "DIV":
+				div(instruction, lineNumber)
+			elif opCode == "ARRADD":
+				addToArray(instruction)
+			elif opCode == "ARRAT":
+				loadArrayAt(instruction)
+			elif opCode == "ARRFIND":
+				findVal(instruction)
+			elif key == "SKIPE" or key == "SKIPL" or key == "SKIPG":
+				lineNumber = skip(instruction,lineNumber)
+				continue
+			else:
+				print "Error on Line", lineNumber, "Wrong operation code!"
+				exit(1)
+
+		else:
+			print "Invalid syntax"
+			exit(1)
+		print instruction
+
+		lineNumber += 1
 
 def add(instruction):
+    print instruction
     left_num = 0
     right_num = 0
     
@@ -172,6 +187,51 @@ def div(instruction, lineNum):
     except: 
         print "Error on Line", lineNum, ": Cannot divide by 0"
         exit(1)
+
+def jump(instruction):
+    print(instruction)
+    if instruction[1] in variable_holder:
+        return variable_holder[instruction[1]]
+    elif instruction[1] in registers:
+        return variable_holder[instruction[1]]
+    else:
+        print("ERROR: " + instruction[2] + " was not declared.")
+
+def skip(instruction, lineNum):
+    if instruction[1] in variable_holder:
+        left = variable_holder[instruction[1]]
+    else:
+        left = isValidNumber(instruction[1],lineNum)
+
+    if instruction[2] in variable_holder:
+        right = variable_holder[instruction[2]]
+    else:
+        right = isValidNumber(instruction[2],lineNum)
+
+
+    if(instruction[0] == "SKIPE"):
+        if(left == right):
+            i = lineNum
+            while(len(text_array[i]) != 0 and i < len(text_array)):
+                i = i + 1
+            return i + 2
+    elif(instruction[0] == "SKIPG"):
+        if(left > right):
+            i = lineNum
+            while(len(text_array[i]) != 0 and i < len(text_array)):
+                i = i + 1
+            return i + 2
+    elif(instruction[0] == "SKIPL"):
+        if(left < right):
+            i = lineNum
+            while(len(text_array[i]) != 0 and i < len(text_array)):
+                i = i + 1
+            return i + 2
+    
+    
+
+    return lineNum - 1
+
 
 def isValidNumber(var, lineNum):
     try:
