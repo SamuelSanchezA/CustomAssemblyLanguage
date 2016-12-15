@@ -106,7 +106,7 @@ def execute():
             elif opCode == "MULT":
                 mult(instruction)
             elif opCode == "DIV":
-                div(instruction)
+                div(instruction, lineNumber)
             elif opCode == "ARRADD":
                 addToArray(instruction)
             elif opCode == "ARRAT":
@@ -114,14 +114,15 @@ def execute():
             elif opCode == "ARRFIND":
                 findVal(instruction)
             else:
-                print "Wrong operation code!\n"
+                print "Error on Line", lineNumber, "Wrong operation code!"
+                exit(1)
         
         if len(instruction) == 1:
             if instruction[0] == " ":
                 print "HALT"
                 break
 
-    lineNumber += 1
+    	lineNumber += 1 
 
 def add(instruction):
     left_num = 0
@@ -155,20 +156,22 @@ def mult(instruction):
 
     variable_holder[instruction[1]] *= right_num
 
-    #print variable_holder[instruction[1]]
+    print variable_holder[instruction[1]]
 
-def div(instruction):
+def div(instruction, lineNum):
     left_num = 0
     right_num = 0
     
     left_num = int(variable_holder[instruction[1]])
     right_num = int(instruction[2])
 
-    if right_num != 0:
+    try: 
+    	right_num != 0
         variable_holder[instruction[1]] /= right_num
         #print variable_holder[instruction[1]]
-    else: 
-        print "Could not divide by zero!"
+    except: 
+        print "Error on Line", lineNum, ": Cannot divide by 0"
+        exit(1)
 
 def isValidNumber(var, lineNum):
     try:
