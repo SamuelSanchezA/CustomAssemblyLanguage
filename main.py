@@ -13,6 +13,7 @@ regexTerms.append(r"^([a-zA-Z]+)( |\t)*,( |\t)*( |\t)*([a-zA-Z]+|-?[0-9]+)$") #V
 regexTerms.append(r"^([a-zA-Z]+)( |\t)*([a-zA-Z]+)( |\t)*,( |\t)*(([a-zA-Z]+)|-?[0-9]+)$")
 regexTerms.append(r"^( )*$")
 regexTerms.append(r"^([a-zA-Z]+)( |\t)*(\:)( |\t)*$")
+regexTerms.append(r"^( |\t)*([a-zA-Z]+)( |\t)*$")
 
 registers = {"R1": 0,"R2":0, "R3":0, "R4":0,"R5":0,"R6":0,"R7":0,"R8":0, "R9":0, "R10":0,
          "R11": 0, "R12":0, "R13":0, "R14":0,"R15":0,"R16":0,"R17":0,"R18":0, "R19":0, "R20":0,
@@ -45,18 +46,21 @@ def verifySyntax():
             #print "In second: ", f
             index = text_array.index(f)
             text_array[index] = re.split(",", f)
+            print text_array[index], "Before"
+            text_array[index][0] = text_array[index][0].strip()
+            text_array[index][1] = text_array[index][1].strip()
             temp = text_array[index][0].split(" ")
             text_array[index].remove(text_array[index][0])
             text_array[index].insert(0,temp[0])
             text_array[index].insert(1,temp[-1])
-            text_array[index][0] = text_array[index][0].strip()
-            text_array[index][1] = text_array[index][1].strip()
-            text_array[index][2] = text_array[index][2].strip()
+            print text_array[index], "After"
         elif re.match(regexTerms[2], f):
             text_array[text_array.index(f)] = ""
         elif re.match(regexTerms[3], f):
             temp = "".join(f.split())    
             text_array[text_array.index(f)] = [temp[:len(temp) -1],temp[-1]]
+        elif re.match(regexTerms[4], f):
+            text_array[text_array.index(f)] = text_array[text_array.index(f)].strip().upper()
         else:
             print "Syntax Error on line", lineNumber, ": ", f
             print "Terminating Program"
@@ -71,7 +75,7 @@ def execute():
         print "lineNumber", lineNumber
         instruction = text_array[lineNumber -1]
         
-        #print instruction
+        print "Instruction:", instruction
 
         if len(instruction) == 0:
                 lineNumber = lineNumber + 1
@@ -95,10 +99,10 @@ def execute():
                 else:
                     variable_holder[key] = isValidNumber(key2, lineNumber)
             elif key2 == ':':
-                variable_holder[key] = lineNumber + 1
+                variable_holder[key] = lineNumber
             elif key == 'JUMP':
                 lineNumber = jump(instruction)
-                continue
+                #continue
             else:
                 print "You little shit!"
                 variable_holder[key] = isValidNumber(key2, lineNumber)
@@ -107,7 +111,7 @@ def execute():
         elif len(instruction) == 3:
 
             opCode = instruction[0] #the read opCode
-            
+            print opCode
             if opCode == "ADD":
                 add(instruction)
             elif opCode == "SUBT":
@@ -123,15 +127,16 @@ def execute():
             elif opCode == "ARRFIND":
                 findVal(instruction)
 
-            elif (key == "SKIPE" or key == "SKIPL" or key == "SKIPG"):
+            elif (opCode == "SKIPE" or opCode == "SKIPL" or opCode == "SKIPG"):
+                print "Got a skip"
                 lineNumber = skip(instruction,lineNumber)
-                continue
+                #continue
             else:
                 print "Wrong operation code!\n"
                 print instruction
         
-        if len(instruction) == 1:
-            if instruction[0] == " ":
+        elif len(instruction) == 1:
+            if instruction[0] == "HALT":
                 print "HALT"
                 break
         print instruction
@@ -207,11 +212,18 @@ def skip(instruction, lineNum):
 
 
     if(instruction[0] == "SKIPE"):
+        print "Made SKIPE"
         if(left == right):
+            print left == right
+            
             i = lineNum
-            while(len(text_array[i]) != 0 and i < len(text_array)):
+            print i
+            #print text_array[i]
+            while text_array[i] == "":
                 i = i + 1
-            return i + 2
+                print i
+            #exit(1)
+            return i+1
     elif(instruction[0] == "SKIPG"):
         if(left > right):
             i = lineNum
@@ -227,7 +239,7 @@ def skip(instruction, lineNum):
     
     
 
-    return lineNum - 1
+    return lineNum
 
 
 def isValidNumber(var, lineNum):
@@ -245,4 +257,4 @@ readLine()
 verifySyntax() # Checks for syntax errors
 print text_array
 execute()
-#print text_array
+print variable_holder['ass']
