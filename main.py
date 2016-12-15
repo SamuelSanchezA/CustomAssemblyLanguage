@@ -9,7 +9,7 @@ global regexTerms
 text_array = []
 variable_holder = {}
 regexTerms = []
-regexTerms.append(r"^([a-zA-Z]+)( |\t)*,( |\t)*( |\t)*(-?[0-9]+)$") #Variable Declaration
+regexTerms.append(r"^([a-zA-Z]+)( |\t)*,( |\t)*( |\t)*([a-zA-Z]+|-?[0-9]+)$") #Variable Declaration
 regexTerms.append(r"^([a-zA-Z]+)( |\t)*([a-zA-Z]+)( |\t)*,( |\t)*(([a-zA-Z]+)|-?[0-9]+)$")
 regexTerms.append(r"^( )*$")
 regexTerms.append(r"^([a-zA-Z]+)( |\t)*(\:)( |\t)*$")
@@ -33,43 +33,47 @@ def readLine():
         exit(1)
 
 def verifySyntax():
-	lineNumber = 1
-	for f in text_array:
+    lineNumber = 1
+    for f in text_array:
         #print f
-		if re.match(regexTerms[0], f):
-			#print f
-			text_array[text_array.index(f)] = re.split(",", f) # Strings split at commas (spaces included in strings however)
-			text_array[lineNumber - 1][0] = text_array[lineNumber - 1][0].strip()
-			text_array[lineNumber - 1][1] = text_array[lineNumber - 1][1].strip()
-		elif re.match(regexTerms[1], f):
-			#print "In second: ", f
-			index = text_array.index(f)
-			text_array[index] = re.split(",", f)
-			temp = text_array[index][0].split(" ")
-			text_array[index].remove(text_array[index][0])
-			text_array[index].insert(0,temp[0])
-			text_array[index].insert(1,temp[-1])
-			text_array[index][0] = text_array[index][0].strip()
-			text_array[index][1] = text_array[index][1].strip()
-			text_array[index][2] = text_array[index][2].strip()
-		elif re.match(regexTerms[2], f):
-		    text_array[text_array.index(f)] = ""
-		elif re.match(regexTerms[3], f):
-		    temp = "".join(f.split())    
-		    text_array[text_array.index(f)] = [temp[:len(temp) -1],temp[-1]]
-		else:
-		    print "Syntax Error on line", lineNumber, ": ", f
-		    print "Terminating Program"
-		    exit(1)
-
+        if re.match(regexTerms[0], f):
+            #print f
+            text_array[text_array.index(f)] = re.split(",", f) # Strings split at commas (spaces included in strings however)
+            text_array[lineNumber - 1][0] = text_array[lineNumber - 1][0].strip()
+            text_array[lineNumber - 1][1] = text_array[lineNumber - 1][1].strip()
+        elif re.match(regexTerms[1], f):
+            #print "In second: ", f
+            index = text_array.index(f)
+            text_array[index] = re.split(",", f)
+            temp = text_array[index][0].split(" ")
+            text_array[index].remove(text_array[index][0])
+            text_array[index].insert(0,temp[0])
+            text_array[index].insert(1,temp[-1])
+            text_array[index][0] = text_array[index][0].strip()
+            text_array[index][1] = text_array[index][1].strip()
+            text_array[index][2] = text_array[index][2].strip()
+        elif re.match(regexTerms[2], f):
+            text_array[text_array.index(f)] = ""
+        elif re.match(regexTerms[3], f):
+            temp = "".join(f.split())    
+            text_array[text_array.index(f)] = [temp[:len(temp) -1],temp[-1]]
+        else:
+            print "Syntax Error on line", lineNumber, ": ", f
+            print "Terminating Program"
+            exit(1)
+        lineNumber = lineNumber + 1
+        print lineNumber
 
 def execute():
     lineNumber = 1
-    for instruction in text_array:
+    while lineNumber - 1 < len(text_array):
+
+        instruction = text_array[lineNumber]
+        print instruction
         #print instruction
         if len(instruction) == 0:
+                lineNumber = lineNumber + 1
                 continue
-
 
         if len(instruction) == 2: # Variable/register declaration
             key = instruction[0].strip()
@@ -88,8 +92,13 @@ def execute():
                     variable_holder[key] = variable_holder[key2]
                 else:
                     variable_holder[key] = isValidNumber(key2, lineNumber)
+            elif key2 == ':':
+                variable_holder[key] = lineNumber + 1
+            elif key == 'JUMP':
+                lineNumber = jump(instruction)
+                continue
             else:
-            	variable_holder[key] = isValidNumber(key2, lineNumber)
+                variable_holder[key] = isValidNumber(key2, lineNumber)
 
         elif len(instruction) == 3:
             print ("Nigga we made it")
@@ -110,6 +119,9 @@ def execute():
                 loadArrayAt(instruction)
             elif key == "ARRFIND":
                 findVal(instruction)
+            elif key == "SKIPE" or key == "SKIPL" or key == "SKIPG":
+                lineNumber = skip(instruction,lineNumber)
+                continue
         
         if len(instruction) == 1:
             if instruction[0] == " ":
@@ -118,9 +130,10 @@ def execute():
 
         print instruction
 
-    lineNumber += 1
+        lineNumber += 1
 
 def add(instruction):
+    print instruction
     left_num = 0
     right_num = 0
     
@@ -134,6 +147,51 @@ def add(instruction):
 
     print "Hello Nick"
     print accumulator
+
+def jump(instruction):
+    print(instruction)
+    if instruction[1] in variable_holder:
+        return variable_holder[instruction[1]]
+    elif instruction[1] in registers:
+        return variable_holder[instruction[1]]
+    else:
+        print("ERROR: " + instruction[2] + " was not declared.")
+
+def skip(instruction, lineNum):
+    if instruction[1] in variable_holder:
+        left = variable_holder[instruction[1]]
+    else:
+        left = isValidNumber(instruction[1],lineNum)
+
+    if instruction[2] in variable_holder:
+        right = variable_holder[instruction[2]]
+    else:
+        right = isValidNumber(instruction[2],lineNum)
+
+
+    if(instruction[0] == "SKIPE"):
+        if(left == right):
+            i = lineNum
+            while(len(text_array[i]) != 0 and i < len(text_array)):
+                i = i + 1
+            return i + 2
+    elif(instruction[0] == "SKIPG"):
+        if(left > right):
+            i = lineNum
+            while(len(text_array[i]) != 0 and i < len(text_array)):
+                i = i + 1
+            return i + 2
+    elif(instruction[0] == "SKIPL"):
+        if(left < right):
+            i = lineNum
+            while(len(text_array[i]) != 0 and i < len(text_array)):
+                i = i + 1
+            return i + 2
+    
+    
+
+    return lineNum - 1
+
 
 def isValidNumber(var, lineNum):
     try:
