@@ -4,7 +4,9 @@ global variable_holder
 global registers
 global text_array
 global memory_addresses 
+global next_memory_address
 global regexTerms
+
 
 text_array = []
 variable_holder = {}
@@ -14,6 +16,7 @@ regexTerms.append(r"^([a-zA-Z]+)( |\t)*([a-zA-Z]+)( |\t)*,( |\t)*(([a-zA-Z]+)|-?
 regexTerms.append(r"^( )*$")
 regexTerms.append(r"^([a-zA-Z]+)( |\t)*(\:)( |\t)*$")
 regexTerms.append(r"^( |\t)*([a-zA-Z]+)( |\t)*$")
+regexTerms.append(r"^( |\t)*([a-zA-Z]+)( |\t)*,( |\t)*\[([0-9])*\]( |\t)*$")# term index 5 array
 
 registers = {"R1": 0,"R2":0, "R3":0, "R4":0,"R5":0,"R6":0,"R7":0,"R8":0, "R9":0, "R10":0,
          "R11": 0, "R12":0, "R13":0, "R14":0,"R15":0,"R16":0,"R17":0,"R18":0, "R19":0, "R20":0,
@@ -61,6 +64,8 @@ def verifySyntax():
             text_array[text_array.index(f)] = [temp[:len(temp) -1],temp[-1]]
         elif re.match(regexTerms[4], f):
             text_array[text_array.index(f)] = text_array[text_array.index(f)].strip().upper()
+        elif re.match(regexTerms[5], f):
+            text_array[text_array.index(f)] = re.split(",", f) 
         else:
             print "Syntax Error on line", lineNumber, ": ", f
             print "Terminating Program"
@@ -110,7 +115,10 @@ def execute():
                     print "Output: " + str(variable_holder[key2])
                 else:
                     print "Output: " + str(isValidNumber(key2,lineNumber))
-            else:
+            elif key2[0] == "[":
+                variable_holder[key] = next_memory_address
+                next_memory_address = next_memory_address + int(key2[1:-1])
+            else: 
                 print "You little shit!"
                 variable_holder[key] = isValidNumber(key2, lineNumber)
 
@@ -265,7 +273,7 @@ def isValidNumber(var, lineNum):
         exit(1)
 
 memory_addresses = [0 for i in range(10000)] # Memory addresses for array purposes
-
+next_memory_address = 0
 readLine()
 verifySyntax() # Checks for syntax errors
 print text_array
