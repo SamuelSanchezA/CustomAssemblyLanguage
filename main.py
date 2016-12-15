@@ -35,14 +35,14 @@ def readLine():
 def verifySyntax():
 	lineNumber = 1
 	for f in text_array:
-        #print f
+
 		if re.match(regexTerms[0], f):
-			#print f
 			text_array[text_array.index(f)] = re.split(",", f) # Strings split at commas (spaces included in strings however)
 			text_array[lineNumber - 1][0] = text_array[lineNumber - 1][0].strip()
 			text_array[lineNumber - 1][1] = text_array[lineNumber - 1][1].strip()
+
 		elif re.match(regexTerms[1], f):
-			#print "In second: ", f
+
 			index = text_array.index(f)
 			text_array[index] = re.split(",", f)
 			temp = text_array[index][0].split(" ")
@@ -52,11 +52,14 @@ def verifySyntax():
 			text_array[index][0] = text_array[index][0].strip()
 			text_array[index][1] = text_array[index][1].strip()
 			text_array[index][2] = text_array[index][2].strip()
+
 		elif re.match(regexTerms[2], f):
 		    text_array[text_array.index(f)] = ""
+
 		elif re.match(regexTerms[3], f):
 		    temp = "".join(f.split())    
 		    text_array[text_array.index(f)] = [temp[:len(temp) -1],temp[-1]]
+            
 		else:
 		    print "Syntax Error on line", lineNumber, ": ", f
 		    print "Terminating Program"
@@ -66,10 +69,9 @@ def verifySyntax():
 def execute():
     lineNumber = 1
     for instruction in text_array:
-        #print instruction
+
         if len(instruction) == 0:
                 continue
-
 
         if len(instruction) == 2: # Variable/register declaration
             key = instruction[0].strip()
@@ -91,24 +93,24 @@ def execute():
             else:
             	variable_holder[key] = isValidNumber(key2, lineNumber)
 
+        # Checks for instruction with length of 3
         elif len(instruction) == 3:
-            print ("Nigga we made it")
-            key = instruction[0]
+
+            opCode = instruction[0] #the read opCode
             
-            # Checks for instruction with length of 3
-            if key == "ADD":
+            if opCode == "ADD":
                 add(instruction)
-            elif key == "SUBT":
+            elif opCode == "SUBT":
                 subt(instruction)
-            elif key == "MULT":
+            elif opCode == "MULT":
                 mult(instruction)
-            elif key == "DIV":
+            elif opCode == "DIV":
                 div(instruction)
-            elif key == "ARRADD":
+            elif opCode == "ARRADD":
                 addToArray(instruction)
-            elif key == "ARRAT":
+            elif opCode == "ARRAT":
                 loadArrayAt(instruction)
-            elif key == "ARRFIND":
+            elif opCode == "ARRFIND":
                 findVal(instruction)
         
         if len(instruction) == 1:
@@ -124,7 +126,6 @@ def add(instruction):
     left_num = 0
     right_num = 0
     
-    #static const to int
     left_num = int(variable_holder[instruction[1]])
     right_num = int(instruction[2])
 
