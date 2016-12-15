@@ -1,7 +1,7 @@
 # CustomAssemblyLanguage
 The following repository contains the code which takes some rudimentary text in a text file and uses it as a language to execute some form of code. The program utilizes Python.
 
-
+Authors: Samuel Sanchez, Coleman Johnston, Michael Sanchez
 
 How to create a variable:
 (variables cannot contain anything but upper and lowercase letters)
@@ -39,22 +39,22 @@ SKIPL varA, varB
 Saves line so you can jump back to it:
 lineName:
  
-how to jump back to a line:
+How to jump back to a line:
 
 JUMP, lineName
 
-how to add one variable to another:
+How to add one variable to another:
 (result is stored in varA)
 ADD varA, varB
 
-how to subtract one variable from another:
+How to subtract one variable from another:
 (result is stored in varA)
 SUBT varA, varB
 
-how to do input:
+How to do input:
 (varA has to be initialized, and input is stored in varA)
 varA, INPUT
 
-how to do output:
+How to do output:
 (prints out what is stored in varA)
 PRINT, varA
