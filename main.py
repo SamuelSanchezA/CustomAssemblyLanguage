@@ -96,6 +96,8 @@ def execute():
                     variable_holder[key] = registers[key2]
                 elif key2 in variable_holder:
                     variable_holder[key] = variable_holder[key2]
+                elif key2 == "INPUT":
+                    variable_holder[key] = int(raw_input("Enter Input: "))
                 else:
                     variable_holder[key] = isValidNumber(key2, lineNumber)
             elif key2 == ':':
@@ -103,6 +105,11 @@ def execute():
             elif key == 'JUMP':
                 lineNumber = jump(instruction)
                 #continue
+            elif key == "PRINT":
+                if key2 in variable_holder:
+                    print "Output: " + str(variable_holder[key2])
+                else:
+                    print "Output: " + str(isValidNumber(key2,lineNumber))
             else:
                 print "You little shit!"
                 variable_holder[key] = isValidNumber(key2, lineNumber)
@@ -218,24 +225,30 @@ def skip(instruction, lineNum):
             
             i = lineNum
             print i
-            #print text_array[i]
             while text_array[i] == "":
                 i = i + 1
                 print i
-            #exit(1)
             return i+1
     elif(instruction[0] == "SKIPG"):
         if(left > right):
+            print left == right
+            
             i = lineNum
-            while(len(text_array[i]) != 0 and i < len(text_array)):
+            print i
+            while text_array[i] == "":
                 i = i + 1
-            return i + 2
+                print i
+            return i+1
     elif(instruction[0] == "SKIPL"):
         if(left < right):
+            print left == right
+            
             i = lineNum
-            while(len(text_array[i]) != 0 and i < len(text_array)):
+            print i
+            while text_array[i] == "":
                 i = i + 1
-            return i + 2
+                print i
+            return i+1
     
     
 
