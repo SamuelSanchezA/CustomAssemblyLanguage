@@ -1,18 +1,20 @@
+iter, 0
+numElts, 0
+sum, 0
+temp, 0
 
-numElts , 2
-ass, 3
-
-startloop :
-
-	ass , INPUT
-
-	SKIPL ass, 6
+numElts, INPUT
 
 
+start:
 
-	JUMP, startloop
+temp, INPUT
+ADD sum, temp
 
-	PRINT, 6
+ADD iter, 1
+SKIPE iter, numElts
+JUMP, start
 
-	PRINT, ass
+PRINT, sum
+
 HALT

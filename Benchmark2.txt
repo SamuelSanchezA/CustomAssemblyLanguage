@@ -17,7 +17,7 @@ target, INPUT
 
 
 
-start_b:
+startb:
 SUBT it, 1
 SKIPG it, -1
 HALT
@@ -25,8 +25,8 @@ HALT
 temp, [it]
 
 SKIPE temp, target
-JUMP start_b
+JUMP, startb
 
-OUTPUT, target
+PRINT, target
 HALT
 
