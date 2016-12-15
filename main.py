@@ -10,10 +10,10 @@ text_array = []
 variable_holder = {}
 regexTerms = []
 regexTerms.append(r"^([a-zA-Z]+)( |\t)*,( |\t)*( |\t)*([a-zA-Z]+|-?[0-9]+)$") #Variable Declaration
-regexTerms.append(r"^([a-zA-Z]+)( |\t)*([a-zA-Z]+)( |\t)*,( |\t)*(([a-zA-Z]+)|-?[0-9]+)$")
-regexTerms.append(r"^( )*$")
-regexTerms.append(r"^([a-zA-Z]+)( |\t)*(\:)( |\t)*$")
-regexTerms.append(r"^( |\t)*([a-zA-Z]+)( |\t)*$")
+regexTerms.append(r"^([a-zA-Z]+)( |\t)*([a-zA-Z]+)( |\t)*,( |\t)*(([a-zA-Z]+)|-?[0-9]+)$") # 3 Word op code
+regexTerms.append(r"^( )*$") # Space
+regexTerms.append(r"^([a-zA-Z]+)( |\t)*(\:)( |\t)*$") # Function
+regexTerms.append(r"^( |\t)*([a-zA-Z]+)( |\t)*$") # Single word op
 
 registers = {"R1": 0,"R2":0, "R3":0, "R4":0,"R5":0,"R6":0,"R7":0,"R8":0, "R9":0, "R10":0,
          "R11": 0, "R12":0, "R13":0, "R14":0,"R15":0,"R16":0,"R17":0,"R18":0, "R19":0, "R20":0,
@@ -31,9 +31,10 @@ def readLine():
             text_array.append(line)
     except:
         print ("File does not exist")
+        print "Terminating Program"
         exit(1)
 
-def verifySyntax():
+def verifySyntax(): # Function to verify if code has correct syntax
     lineNumber = 1
     for f in text_array:
         if re.match(regexTerms[0], f):
@@ -45,14 +46,14 @@ def verifySyntax():
             #print "In second: ", f
             index = text_array.index(f)
             text_array[index] = re.split(",", f)
-            print text_array[index], "Before"
+            #print text_array[index], "Before"
             text_array[index][0] = text_array[index][0].strip()
             text_array[index][1] = text_array[index][1].strip()
             temp = text_array[index][0].split(" ")
             text_array[index].remove(text_array[index][0])
             text_array[index].insert(0,temp[0])
             text_array[index].insert(1,temp[-1])
-            print text_array[index], "After"
+            #print text_array[index], "After"
         elif re.match(regexTerms[2], f):
             text_array[text_array.index(f)] = ""
         elif re.match(regexTerms[3], f):
@@ -71,10 +72,10 @@ def verifySyntax():
 def execute():
 	lineNumber = 1
 	while lineNumber - 1 < len(text_array):
-	    print "lineNumber", lineNumber
+	    #print "lineNumber", lineNumber
 	    instruction = text_array[lineNumber -1]
 	    
-	    print "Instruction:", instruction
+	    #print "Instruction:", instruction
 
 	    if len(instruction) == 0:
 	            lineNumber = lineNumber + 1
@@ -96,7 +97,7 @@ def execute():
 	            elif key2 in variable_holder:
 	                variable_holder[key] = variable_holder[key2]
 	            elif key2 == "INPUT":
-	                variable_holder[key] = int(raw_input("Enter Input: "))
+	                variable_holder[key] = isValidNumber(raw_input("Enter Input: "),lineNumber)
 	            else:
 	                variable_holder[key] = isValidNumber(key2, lineNumber)
 	        elif key2 == ':':
@@ -110,14 +111,14 @@ def execute():
 	            else:
 	                print "Output: " + str(isValidNumber(key2,lineNumber))
 	        else:
-	            print "You little shit!"
+	            #print "You little shit!"
 	            variable_holder[key] = isValidNumber(key2, lineNumber)
 
 	    # Checks for instruction with length of 3
 	    elif len(instruction) == 3:
 
 	        opCode = instruction[0] #the read opCode
-	        print opCode
+	        #print opCode
 	        if opCode == "ADD":
 	            add(instruction)
 	        elif opCode == "SUBT":
@@ -134,26 +135,27 @@ def execute():
 	            findVal(instruction)
 
 	        elif (opCode == "SKIPE" or opCode == "SKIPL" or opCode == "SKIPG"):
-	            print "Got a skip"
+	            #print "Got a skip"
 	            lineNumber = skip(instruction,lineNumber)
-	            #continue
+	           
 	        else:
-	            print "Wrong operation code!\n"
-	            print instruction
+	            print "Error on line",lineNumber,":"
+	            print "\t\"",instruction[0],"\" Is not a valid op code!"
+	            print "Terminating Program"
+	            exit(1)
 	    
 	    elif len(instruction) == 1:
 	        if instruction[0] == "HALT":
 	            print "HALT"
 	            break
-	    print instruction
+	    #print instruction
 	    lineNumber += 1
 
-
 def add(instruction):
-    print instruction
+    #print instruction
     left_num = 0
     right_num = 0
-    print variable_holder
+    #print variable_holder
     left_num = int(variable_holder[instruction[1]])
     right_num = int(instruction[2])
 
@@ -181,7 +183,7 @@ def mult(instruction):
 
     variable_holder[instruction[1]] *= right_num
 
-    print variable_holder[instruction[1]]
+    #print variable_holder[instruction[1]]
 
 def div(instruction, lineNum):
     left_num = 0
@@ -199,7 +201,7 @@ def div(instruction, lineNum):
         exit(1)
 
 def jump(instruction):
-    print(instruction)
+    #print(instruction)
     if instruction[1] in variable_holder:
         return variable_holder[instruction[1]]
     elif instruction[1] in registers:
@@ -220,35 +222,35 @@ def skip(instruction, lineNum):
 
 
     if(instruction[0] == "SKIPE"):
-        print "Made SKIPE"
+        #print "Made SKIPE"
         if(left == right):
-            print left == right
+            #print left == right
             
             i = lineNum
-            print i
+            #print i
             while text_array[i] == "":
                 i = i + 1
-                print i
+                #print i
             return i+1
     elif(instruction[0] == "SKIPG"):
         if(left > right):
-            print left == right
+            #print left == right
             
             i = lineNum
-            print i
+            #print i
             while text_array[i] == "":
                 i = i + 1
-                print i
+                #print i
             return i+1
     elif(instruction[0] == "SKIPL"):
         if(left < right):
-            print left == right
+            #print left == right
             
             i = lineNum
-            print i
+            #print i
             while text_array[i] == "":
                 i = i + 1
-                print i
+                #print i
             return i+1
     
     
@@ -269,6 +271,5 @@ memory_addresses = [0 for i in range(10000)] # Memory addresses for array purpos
 
 readLine()
 verifySyntax() # Checks for syntax errors
-print text_array
+#print text_array
 execute()
-print variable_holder['ass']
