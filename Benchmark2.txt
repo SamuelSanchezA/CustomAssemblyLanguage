@@ -1,4 +1,17 @@
 numElts , 2
-MULT numElts, 4
-DIV numElts, 3
+ass, 3
+
+startloop :
+
+	ass , INPUT
+
+	SKIPL ass, 6
+
+
+
+	JUMP, startloop
+
+	PRINT, 6
+
+	PRINT, ass
 HALT
