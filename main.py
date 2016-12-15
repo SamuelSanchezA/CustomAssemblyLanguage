@@ -35,7 +35,6 @@ def readLine():
 def verifySyntax():
     lineNumber = 1
     for f in text_array:
-        #print f
         if re.match(regexTerms[0], f):
             #print f
             text_array[text_array.index(f)] = re.split(",", f) # Strings split at commas (spaces included in strings however)
@@ -61,17 +60,17 @@ def verifySyntax():
             print "Syntax Error on line", lineNumber, ": ", f
             print "Terminating Program"
             exit(1)
+        #print lineNumber + text_array[lineNumber]
         lineNumber = lineNumber + 1
-        print lineNumber
+        
 
 def execute():
     lineNumber = 1
     while lineNumber - 1 < len(text_array):
-
-        instruction = text_array[lineNumber]
-        print instruction
+        print "lineNumber", lineNumber
+        instruction = text_array[lineNumber -1]
+        
         #print instruction
->>>>>>> Coleman
         if len(instruction) == 0:
                 lineNumber = lineNumber + 1
                 continue
@@ -99,6 +98,7 @@ def execute():
                 lineNumber = jump(instruction)
                 continue
             else:
+                print "You little shit!"
                 variable_holder[key] = isValidNumber(key2, lineNumber)
 
         # Checks for instruction with length of 3
@@ -120,29 +120,30 @@ def execute():
                 loadArrayAt(instruction)
             elif opCode == "ARRFIND":
                 findVal(instruction)
-            elif key == "SKIPE" or key == "SKIPL" or key == "SKIPG":
+
+            elif (key == "SKIPE" or key == "SKIPL" or key == "SKIPG"):
                 lineNumber = skip(instruction,lineNumber)
                 continue
+            else:
+                print "Wrong operation code!\n"
+                print instruction
         
         if len(instruction) == 1:
             if instruction[0] == " ":
                 print "HALT"
                 break
-
         print instruction
-
         lineNumber += 1
 
 def add(instruction):
     print instruction
     left_num = 0
     right_num = 0
-    
+    print variable_holder
     left_num = int(variable_holder[instruction[1]])
     right_num = int(instruction[2])
 
     variable_holder[instruction[1]] += right_num
-
     #print variable_holder[instruction[1]]
 
 
@@ -239,6 +240,6 @@ memory_addresses = [0 for i in range(10000)] # Memory addresses for array purpos
 
 readLine()
 verifySyntax() # Checks for syntax errors
-#print text_array
+print text_array
 execute()
 #print text_array
