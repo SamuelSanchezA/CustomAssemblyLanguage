@@ -1,16 +1,19 @@
-elementCount, 0
-elementCount, INPUT
-count, 0
-sum, 0
-val, 0
-startLoop:
-	val, INPUT
-	ADD sum, val
-	ADD count, 1
-	SKIPE count, elementCount
-	JUMP, startLoop
-	
-	PRINT, sum
+
+numElts , 2
+ass, 3
+
+startloop :
+
+	ass , INPUT
+
+	SKIPL ass, 6
 
 
+
+	JUMP, startloop
+
+	PRINT, 6
+
+	PRINT, ass
+>>>>>>> Michael
 HALT
