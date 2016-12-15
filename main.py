@@ -25,7 +25,7 @@ registers = {"R1": 0,"R2":0, "R3":0, "R4":0,"R5":0,"R6":0,"R7":0,"R8":0, "R9":0,
 
 def readLine():
     try:
-        textFile = open("Benchmark2.txt", 'r')
+        textFile = open("Benchmark1.txt", 'r')
         for line in textFile: # This for loop will place all lines into a list for syntax check
             line = line.strip()
             text_array.append(line)
@@ -39,9 +39,11 @@ def verifySyntax(): # Function to verify if code has correct syntax
     for f in text_array:
         if re.match(regexTerms[0], f):
             #print f
-            text_array[text_array.index(f)] = re.split(",", f) # Strings split at commas (spaces included in strings however)
-            text_array[lineNumber - 1][0] = text_array[lineNumber - 1][0].strip()
-            text_array[lineNumber - 1][1] = text_array[lineNumber - 1][1].strip()
+            index = text_array.index(f)
+            text_array[index] = re.split(",", f) # Strings split at commas (spaces included in strings however)
+            text_array[index][0] = text_array[index][0].strip()
+            text_array[index][1] = text_array[index][1].strip()
+            #print text_array[index]
         elif re.match(regexTerms[1], f):
             #print "In second: ", f
             index = text_array.index(f)
@@ -80,8 +82,12 @@ def execute():
 	    if len(instruction) == 0:
 	            lineNumber = lineNumber + 1
 	            continue
+	    elif len(instruction) == 1:
+	       if instruction[0] == "HALT":
+	           print "HALT detected: Ending Program"
+	           exit(1)
 
-	    if len(instruction) == 2: # Variable/register declaration
+	    elif len(instruction) == 2: # Variable/register declaration
 	        key = instruction[0].strip()
 	        key2 = instruction[1].strip()
 	        if key in registers:
@@ -144,10 +150,6 @@ def execute():
 	            print "Terminating Program"
 	            exit(1)
 	    
-	    elif len(instruction) == 1:
-	        if instruction[0] == "HALT":
-	            print "HALT"
-	            break
 	    #print instruction
 	    lineNumber += 1
 
@@ -157,43 +159,66 @@ def add(instruction):
     right_num = 0
     #print variable_holder
     left_num = int(variable_holder[instruction[1]])
-    right_num = int(instruction[2])
 
+    if instruction[2] in variable_holder:
+    	right_num = int(variable_holder[instruction[2]])
+    elif instruction[2] in registers:
+    	right_num = int(registers[instruction[2]])
+    else:
+    	right_num = int(instruction[2])
     variable_holder[instruction[1]] += right_num
     #print variable_holder[instruction[1]]
 
 
 def subt(instruction):
+    #print instruction
     left_num = 0
     right_num = 0
-    
+    #print variable_holder
     left_num = int(variable_holder[instruction[1]])
-    right_num = int(instruction[2])
 
+    if instruction[2] in variable_holder:
+    	right_num = int(variable_holder[instruction[2]])
+    elif instruction[2] in registers:
+    	right_num = int(registers[instruction[2]])
+    else:
+    	right_num = int(instruction[2])
     variable_holder[instruction[1]] -= right_num
-
     #print variable_holder[instruction[1]]
 
 def mult(instruction):
+    #print instruction
     left_num = 0
     right_num = 0
-    
+    #print variable_holder
     left_num = int(variable_holder[instruction[1]])
-    right_num = int(instruction[2])
 
+    if instruction[2] in variable_holder:
+    	right_num = int(variable_holder[instruction[2]])
+    elif instruction[2] in registers:
+    	right_num = int(registers[instruction[2]])
+    else:
+    	right_num = int(instruction[2])
     variable_holder[instruction[1]] *= right_num
-
     #print variable_holder[instruction[1]]
 
 def div(instruction, lineNum):
+    #print instruction
     left_num = 0
     right_num = 0
-    
+    #print variable_holder
     left_num = int(variable_holder[instruction[1]])
-    right_num = int(instruction[2])
+
+    if instruction[2] in variable_holder:
+    	right_num = int(variable_holder[instruction[2]])
+    elif instruction[2] in registers:
+    	right_num = int(registers[instruction[2]])
+    else:
+    	right_num = int(instruction[2])
+    variable_holder[instruction[1]] += right_num
+    #print variable_holder[instruction[1]]
 
     try: 
-    	right_num != 0
         variable_holder[instruction[1]] /= right_num
         #print variable_holder[instruction[1]]
     except: 
