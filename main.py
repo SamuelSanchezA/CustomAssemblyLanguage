@@ -33,9 +33,9 @@ def readLine():
         exit(1)
 
 def verifySyntax():
+
     lineNumber = 1
     for f in text_array:
-        #print f
         if re.match(regexTerms[0], f):
             #print f
             text_array[text_array.index(f)] = re.split(",", f) # Strings split at commas (spaces included in strings however)
@@ -61,16 +61,18 @@ def verifySyntax():
             print "Syntax Error on line", lineNumber, ": ", f
             print "Terminating Program"
             exit(1)
+        #print lineNumber + text_array[lineNumber]
         lineNumber = lineNumber + 1
-        print lineNumber
+        
 
 def execute():
     lineNumber = 1
     while lineNumber - 1 < len(text_array):
-
-        instruction = text_array[lineNumber]
-        print instruction
+        print "lineNumber", lineNumber
+        instruction = text_array[lineNumber -1]
+        
         #print instruction
+
         if len(instruction) == 0:
                 lineNumber = lineNumber + 1
                 continue
@@ -98,55 +100,90 @@ def execute():
                 lineNumber = jump(instruction)
                 continue
             else:
+                print "You little shit!"
                 variable_holder[key] = isValidNumber(key2, lineNumber)
 
+        # Checks for instruction with length of 3
         elif len(instruction) == 3:
-            print ("Nigga we made it")
-            key = instruction[0]
+
+            opCode = instruction[0] #the read opCode
             
-            # Checks for instruction with length of 3
-            if key == "ADD":
+            if opCode == "ADD":
                 add(instruction)
-            elif key == "SUBT":
+            elif opCode == "SUBT":
                 subt(instruction)
-            elif key == "MULT":
+            elif opCode == "MULT":
                 mult(instruction)
-            elif key == "DIV":
+            elif opCode == "DIV":
                 div(instruction)
-            elif key == "ARRADD":
+            elif opCode == "ARRADD":
                 addToArray(instruction)
-            elif key == "ARRAT":
+            elif opCode == "ARRAT":
                 loadArrayAt(instruction)
-            elif key == "ARRFIND":
+            elif opCode == "ARRFIND":
                 findVal(instruction)
-            elif key == "SKIPE" or key == "SKIPL" or key == "SKIPG":
+
+            elif (key == "SKIPE" or key == "SKIPL" or key == "SKIPG"):
                 lineNumber = skip(instruction,lineNumber)
                 continue
+            else:
+                print "Wrong operation code!\n"
+                print instruction
         
         if len(instruction) == 1:
             if instruction[0] == " ":
                 print "HALT"
                 break
-
         print instruction
-
         lineNumber += 1
+
 
 def add(instruction):
     print instruction
     left_num = 0
     right_num = 0
-    
-    #static const to int
+    print variable_holder
     left_num = int(variable_holder[instruction[1]])
     right_num = int(instruction[2])
 
+    variable_holder[instruction[1]] += right_num
+    #print variable_holder[instruction[1]]
 
-    global accumulator
-    accumulator = left_num + right_num
 
-    print "Hello Nick"
-    print accumulator
+def subt(instruction):
+    left_num = 0
+    right_num = 0
+    
+    left_num = int(variable_holder[instruction[1]])
+    right_num = int(instruction[2])
+
+    variable_holder[instruction[1]] -= right_num
+
+    #print variable_holder[instruction[1]]
+
+def mult(instruction):
+    left_num = 0
+    right_num = 0
+    
+    left_num = int(variable_holder[instruction[1]])
+    right_num = int(instruction[2])
+
+    variable_holder[instruction[1]] *= right_num
+
+    #print variable_holder[instruction[1]]
+
+def div(instruction):
+    left_num = 0
+    right_num = 0
+    
+    left_num = int(variable_holder[instruction[1]])
+    right_num = int(instruction[2])
+
+    if right_num != 0:
+        variable_holder[instruction[1]] /= right_num
+        #print variable_holder[instruction[1]]
+    else: 
+        print "Could not divide by zero!"
 
 def jump(instruction):
     print(instruction)
@@ -206,7 +243,6 @@ memory_addresses = [0 for i in range(10000)] # Memory addresses for array purpos
 
 readLine()
 verifySyntax() # Checks for syntax errors
-#print text_array
-execute()
 print text_array
+execute()
 #print text_array
