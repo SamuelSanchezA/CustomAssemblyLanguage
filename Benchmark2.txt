@@ -1,4 +1,4 @@
-numElts,          2
+numElts ,          2
 ADD numElts, 4
 
 startfunc:    				
