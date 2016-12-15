@@ -1,5 +1,17 @@
-numElts ,          2
-ADD numElts, 4
+numElts , 2
+ass, 3
 
-startfunc:    				
+startloop :
 
+ass , INPUT
+
+SKIPL ass, 6
+
+
+
+JUMP, startloop
+
+PRINT, 6
+
+PRINT, ass
+HALT
