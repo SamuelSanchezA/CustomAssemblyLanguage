@@ -31,7 +31,7 @@ registers = {"R1": 0,"R2":0, "R3":0, "R4":0,"R5":0,"R6":0,"R7":0,"R8":0, "R9":0,
 
 def readLine():
     try:
-        textFile = open("Benchmark1.txt", 'r')
+        textFile = open("Benchmark2.txt", 'r')
         for line in textFile: # This for loop will place all lines into a list for syntax check
             line = line.strip()
             text_array.append(line)
@@ -68,7 +68,7 @@ def verifySyntax(): # Function to verify if code has correct syntax
             temp = "".join(f.split())    
             text_array[text_array.index(f)] = [temp[:len(temp) -1],temp[-1]]
         elif re.match(regexTerms[4], f):
-            text_array[text_array.index(f)] = text_array[text_array.index(f)].strip().upper()
+            text_array[text_array.index(f)] = text_array[text_array.index(f)].strip().upper().split()
         elif re.match(regexTerms[5], f):
             text_array[text_array.index(f)] = re.split(",", f)
         elif re.match(regexTerms[6], f):

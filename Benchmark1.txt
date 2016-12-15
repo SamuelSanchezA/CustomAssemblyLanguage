@@ -2,7 +2,6 @@ iter, 0
 numElts, 0
 sum, 0
 temp, 0
-
 numElts, INPUT
 
 
